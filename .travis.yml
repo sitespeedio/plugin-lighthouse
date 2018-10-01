@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+- '8'
+- '9'
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    - google-chrome
+    packages:
+    - g++-4.8
+    - google-chrome-stable
+before_install:
+- google-chrome --product-version
+- export DISPLAY=:99.0
+- "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile
+  --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1600x1024x16"
+- cd .. && git clone https://github.com/sitespeedio/sitespeed.io.git
+- cd sitespeed.io && npm install -g && cd ../plugin-lighthouse
+script:
+- npm run lint
+- sitespeed.io --plugins.add . https://www.sitespeed.io/ -n 1
+notifications:
+  slack:
+    secure: CDiXaDmWzsA2IpKZiST744uZooaoTuJ+qTMWElSWsHIp6cA/mbOLcZGsmhemmKaYvKl7ASF8doJrCaBinmy59Unzs0Er/Kfp1gwlQ4wpbOk3Bj072bgM3r8ipIunnEa0S6ynGK6n2OtUZOlnmUsP1dha9ndRVsT+vK4W9xqzsl0grRXcvv+56vkzvcPGq7rATMnbIpT4DvbzgX0NoAyZZMz6/R1CPnGVirp/7dHB6+OYkt6wooM0yCJS32G1JsjoZMwHSqs697pVOsOziO6LZ9NlBRp5Fv0SsIFQAroX6zqOkWjtjR8sPs8MDqw8K2pM7Wi4NKgV1qUTqi1a9ScfgRZ2cg9o2hKsPHBSpYq1v4ijlNm7O4gAs0t0XupJtrUS9gi1cAnHKT0/JJDLXRZOmAYIeSH76WnefAEpcXGKXKWqOQVlG4/cPbD9Xi3WswWVUoxrFCWM+ORGdfM/qMbUtBWfD1HCM13Sqv/DDX5F2gFGQZda1WjWZQ11HEnZWFhGvT7kDYbPc816XMP26gpq3xxsi9vtfmo09RvFRk2mTwlXAK8ppS40GeAlNOolxWjPGrWZBzwIBVUmRiyKZf4KgIkBD3z9woDQnoFr+FWwe1Yi0uqqhov1iI8iu/xhjdEP8PDyfy1FuoF4mlE0xqBAFqGx55SWFKxlMaBixRqoYf0=
+env:
+  global:
+    secure: vZZocQuMGxU85J1a5Zh6H3IceHIe++SfctlKcb4YOVgTwxv0IrWqRCe/EXpLLTeVkXHVuXP37nmfxo5k3piwP4c9plvYX7tTsXw6KT4LuJIQAaxMJjBQdoIfnU8SO/bnCMpElUTAyRYFflolNU4Edc7Cg3qJu0WGWTV3cNTSmobTRnN6YnMw4qP2gC5O9FeaCxhL2+mNDYx7FSwQkxqIbVuDBioSPFdWvQe8UXgzQR60ziJD9MxQSi4C+GRkk/+6NKuvIuGx9JDQbC5KUtuPluFsgOMSo7h3O39KC7F82fI0HnHUZfsuKB8zWMEBnVs2Fcfk6c2+u0z9RSqZ/Od+lrAKoewbluQHZw6UfSgPutyPlVNOFJJj7NG3WVSJJ7dQo4JOAjFMmqVgbzDR55OFGnS7kKa9kWzkU8Tac4HyQCPrfmn7yzJyi63Yr4uZPdskbX5KUz2+zMY/VRxmHQwZAM5WGS82K4U/vA00KmmzJwuqhIAZCkJVePEVMoFXvDYW8TCM7lrOj4z3mV4JmgTj+pojb/R4Yy31l4s31SyOoZsjDlJA3UkJXhtRG4R+GtGjFQmvdbbQJ+LdEGD2pRf5iL9WD74E9LN5GGaZqy1XaYl9u0J+Xe4ArS3Eo8GUmpQKwIlXyDijTq5RZuT23Fa4fRHs2w+cMWK0wLEXD8jVQP0=
