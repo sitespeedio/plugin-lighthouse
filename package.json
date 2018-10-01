@@ -1,0 +1,35 @@
+{
+  "name": "@sitespeed.io/plugin-lighthouse",
+  "version": "0.1.0",
+  "description": "Lighthouse plugin for sitespeed.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sitespeedio/plugin-lighthouse.git"
+  },
+  "keywords": [
+    "sitespeed.io",
+    "lighthouse",
+    "webperf",
+    "perfmatters"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sitespeedio/plugin-lighthouse/issues"
+  },
+  "devDependencies": {
+    "eslint": "5.6.1",
+    "eslint-config-prettier": "3.1.0",
+    "eslint-plugin-prettier": "3.0.0",
+    "prettier": "1.14.3",
+    "pug-lint": "2.5.0"
+  },
+  "dependencies": {
+    "lighthouse": "^3.2.1"
+  },
+  "scripts": {
+    "lint": "eslint . && npm run pug-lint",
+    "lint:fix": "eslint . --fix",
+    "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
+    "pug-lint": "pug-lint lighthouse.pug"
+  }
+}
