@@ -61,6 +61,12 @@ module.exports = {
             type: 'pageSummary'
           })
         );
+
+        queue.postMessage(
+          make('budget.addMessageType', {
+            type: 'lighthouse.pageSummary'
+          })
+        );
         break;
       }
 
