@@ -79,6 +79,7 @@ module.exports = {
         return launchChromeAndRunLighthouse(url, this.lightHouseOptions).then(
           result => {
             log.info('Got Lighthouse metrics');
+            log.verbose('Result from Lightouse:%:2j', result);
             queue.postMessage(
               make('lighthouse.pageSummary', result, {
                 url,
