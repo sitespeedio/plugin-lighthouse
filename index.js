@@ -17,7 +17,7 @@ const defaultChromeSettings = {
   chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu']
 };
 
-function launchChromeAndRunLighthouse(url, opts) {
+async function launchChromeAndRunLighthouse(url, opts) {
   return chromeLauncher
     .launch({ chromeFlags: defaultChromeSettings.chromeFlags })
     .then(chrome => {
@@ -41,17 +41,54 @@ module.exports = {
     );
 
     this.lightHouseOptions = options.lighthouse || {};
+    this.usingBrowsertime = false;
+    this.summaries = 0;
+    this.urls = [];
 
     context.filterRegistry.registerFilterForType(
       DEFAULT_SUMMARY_METRICS,
       'lighthouse.pageSummary'
     );
   },
-  processMessage(message, queue) {
+  async processMessage(message, queue) {
     const make = this.make;
     const log = this.log;
 
     switch (message.type) {
+      case 'browsertime.setup': {
+        // We know we will use Browsertime so we wanna keep track of Browseertime summaries
+        this.usingBrowsertime = true;
+        log.info('Will run Lighthouse tests after Browsertime has finished');
+        break;
+      }
+
+      case 'browsertime.pageSummary': {
+        if (this.usingBrowsertime) {
+          this.summaries++;
+          if (this.summaries === this.urls.length) {
+            for (let urlAndGroup of this.urls) {
+              log.info(
+                'Will collect Lighthouse metrics for %s',
+                urlAndGroup.url
+              );
+              const result = await launchChromeAndRunLighthouse(
+                urlAndGroup.url,
+                this.lightHouseOptions
+              );
+              log.info('Got Lighthouse metrics');
+              log.verbose('Result from Lightouse:%:2j', result);
+              queue.postMessage(
+                make('lighthouse.pageSummary', result, {
+                  url: urlAndGroup.url,
+                  group: urlAndGroup.group
+                })
+              );
+            }
+          }
+        }
+        break;
+      }
+
       case 'sitespeedio.setup': {
         queue.postMessage(
           make('html.pug', {
@@ -71,23 +108,25 @@ module.exports = {
       }
 
       case 'url': {
-        const url = message.url;
-        const group = message.group;
-        log.info('Start collecting Lighthouse result');
-
-        // Usage:
-        return launchChromeAndRunLighthouse(url, this.lightHouseOptions).then(
-          result => {
-            log.info('Got Lighthouse metrics');
-            log.verbose('Result from Lightouse:%:2j', result);
-            queue.postMessage(
-              make('lighthouse.pageSummary', result, {
-                url,
-                group
-              })
-            );
-          }
-        );
+        if (this.usingBrowsertime) {
+          this.urls.push({ url: message.url, group: message.group });
+        } else {
+          const url = message.url;
+          const group = message.group;
+          log.info('Start collecting Lighthouse result for %s', url);
+          return launchChromeAndRunLighthouse(url, this.lightHouseOptions).then(
+            result => {
+              log.info('Got Lighthouse metrics');
+              log.verbose('Result from Lightouse:%:2j', result);
+              queue.postMessage(
+                make('lighthouse.pageSummary', result, {
+                  url,
+                  group
+                })
+              );
+            }
+          );
+        }
       }
     }
   }
