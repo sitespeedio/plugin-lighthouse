@@ -114,17 +114,17 @@ module.exports = {
           const url = message.url;
           const group = message.group;
           log.info('Start collecting Lighthouse result for %s', url);
-          return launchChromeAndRunLighthouse(url, this.lightHouseOptions).then(
-            result => {
-              log.info('Got Lighthouse metrics');
-              log.verbose('Result from Lightouse:%:2j', result);
-              queue.postMessage(
-                make('lighthouse.pageSummary', result, {
-                  url,
-                  group
-                })
-              );
-            }
+          const result = await launchChromeAndRunLighthouse(
+            url,
+            this.lightHouseOptions
+          );
+          log.info('Got Lighthouse metrics');
+          log.verbose('Result from Lightouse:%:2j', result);
+          queue.postMessage(
+            make('lighthouse.pageSummary', result, {
+              url,
+              group
+            })
           );
         }
       }
