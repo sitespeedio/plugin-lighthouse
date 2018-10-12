@@ -19,13 +19,13 @@ bin/sitespeed.js --plugins.add ../plugin-lighthouse/ https://www.sitespeed.io/ -
 ## Run in production
 If you want to run Lighthouse with your other sitespeed.io test, follow the instructions in the [add a plugin docs](https://www.sitespeed.io/documentation/sitespeed.io/plugins/#add-a-plugin).
 
+The Lighthouse tests will run after Browsertime finished and run Chrome headless.
+
 ## Data to Graphite/InfluxDB
 The plugin will automatically send the performance, pwa, best practice, accessibility and SEO score to Graphite/InfluxDB.
 
 ## Configuration
 Everything that you pass on with --lighthouse.* will be passed to Lighthouse.
-
-
 
 ## sitespeed.io version
 You need sitespeed.io 7.5 or later to run the plugin.

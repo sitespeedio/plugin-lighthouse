@@ -16,7 +16,9 @@
         "singleQuote": true
       }
     ],
-    "no-extra-semi": 0,
-    "no-mixed-spaces-and-tabs": 0
+    "no-extra-semi": "off",
+    "no-mixed-spaces-and-tabs": "off",
+    "no-unexpected-multiline": "off",
+    "no-return-await": "error"
   }
 }
