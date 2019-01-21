@@ -107,6 +107,13 @@ module.exports = {
         break;
       }
 
+      case 'browsertime.navigationScripts': {
+        log.info(
+          'Lighthouse can only be used on URLs and not with scripting/multiple pages at the moment'
+        );
+        break;
+      }
+
       case 'url': {
         if (this.usingBrowsertime) {
           this.urls.push({ url: message.url, group: message.group });
