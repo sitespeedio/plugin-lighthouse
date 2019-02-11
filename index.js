@@ -71,18 +71,34 @@ module.exports = {
                 'Will collect Lighthouse metrics for %s',
                 urlAndGroup.url
               );
-              const result = await launchChromeAndRunLighthouse(
-                urlAndGroup.url,
-                this.lightHouseOptions
-              );
-              log.info('Got Lighthouse metrics');
-              log.verbose('Result from Lightouse:%:2j', result);
-              queue.postMessage(
-                make('lighthouse.pageSummary', result, {
-                  url: urlAndGroup.url,
-                  group: urlAndGroup.group
-                })
-              );
+              try {
+                const result = await launchChromeAndRunLighthouse(
+                  urlAndGroup.url,
+                  this.lightHouseOptions
+                );
+                log.info('Got Lighthouse metrics');
+                log.verbose('Result from Lightouse:%:2j', result);
+                queue.postMessage(
+                  make('lighthouse.pageSummary', result, {
+                    url: urlAndGroup.url,
+                    group: urlAndGroup.group
+                  })
+                );
+              } catch (e) {
+                log.error(
+                  'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
+                  urlAndGroup.url
+                );
+                queue.postMessage(
+                  make(
+                    'error',
+                    'Lighthouse got the following errors: ' + JSON.stringify(e),
+                    {
+                      url: urlAndGroup.url
+                    }
+                  )
+                );
+              }
             }
           }
         }
@@ -121,18 +137,34 @@ module.exports = {
           const url = message.url;
           const group = message.group;
           log.info('Start collecting Lighthouse result for %s', url);
-          const result = await launchChromeAndRunLighthouse(
-            url,
-            this.lightHouseOptions
-          );
-          log.info('Got Lighthouse metrics');
-          log.verbose('Result from Lightouse:%:2j', result);
-          queue.postMessage(
-            make('lighthouse.pageSummary', result, {
+          try {
+            const result = await launchChromeAndRunLighthouse(
               url,
-              group
-            })
-          );
+              this.lightHouseOptions
+            );
+            log.info('Got Lighthouse metrics');
+            log.verbose('Result from Lightouse:%:2j', result);
+            queue.postMessage(
+              make('lighthouse.pageSummary', result, {
+                url,
+                group
+              })
+            );
+          } catch (e) {
+            log.error(
+              'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
+              url
+            );
+            queue.postMessage(
+              make(
+                'error',
+                'Lighthouse got the following errors: ' + JSON.stringify(e),
+                {
+                  url
+                }
+              )
+            );
+          }
         }
       }
     }
