@@ -14,7 +14,12 @@ const DEFAULT_SUMMARY_METRICS = [
 ];
 
 const defaultChromeSettings = {
-  chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu']
+  chromeFlags: [
+    '--no-sandbox',
+    '--headless',
+    '--disable-gpu',
+    '--ignore-certificate-errors'
+  ]
 };
 
 async function launchChromeAndRunLighthouse(url, opts) {
