@@ -17,12 +17,11 @@ const defaultChromeSettings = {
   chromeFlags: ['--no-sandbox', '--headless', '--disable-gpu']
 };
 
-async function launchChromeAndRunLighthouse(url, opts) {
+async function launchChromeAndRunLighthouse(url, config) {
   return chromeLauncher
     .launch({ chromeFlags: defaultChromeSettings.chromeFlags })
     .then(chrome => {
-      opts.port = chrome.port;
-      return lighthouse(url, opts).then(results => {
+      return lighthouse(url, { port: chrome.port }, config).then(results => {
         return chrome.kill().then(() => results.lhr);
       });
     });
@@ -40,7 +39,7 @@ module.exports = {
       'utf8'
     );
 
-    this.lightHouseOptions = options.lighthouse || {};
+    this.lightHouseOptions = options.lighthouse;
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
