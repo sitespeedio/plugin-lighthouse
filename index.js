@@ -21,6 +21,9 @@ async function launchChromeAndRunLighthouse(url, config) {
   return chromeLauncher
     .launch({ chromeFlags: defaultChromeSettings.chromeFlags })
     .then(chrome => {
+      if (config && !config.extends) {
+        config.extends = 'lighthouse:default';
+      }
       return lighthouse(url, { port: chrome.port }, config).then(results => {
         return chrome.kill().then(() => results.lhr);
       });
