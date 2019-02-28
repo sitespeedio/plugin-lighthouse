@@ -36,7 +36,19 @@ Search for **lighthouse.pageSummary.** there you will have all the metrics that 
 The look at the docs on how you can send them: [https://www.sitespeed.io/documentation/sitespeed.io/metrics/#add-a-metric](https://www.sitespeed.io/documentation/sitespeed.io/metrics/#add-a-metric).
 
 ## Configuration
-Everything that you pass on with --lighthouse.* will be passed to Lighthouse.
+You can pass config to Lighthouse using the `--lighthouse` CLI flag. Since this plugin using the Lighthouse node module and not the CLI, some options from the CLI API are not available. You can find a list of supported flags by checking out the [SharedFlagsSetting](https://github.com/GoogleChrome/lighthouse/blob/41bc409deddb44dd607d2606b7e57e1d239641a7/types/externs.d.ts) interface in the Lighthouse repository.
+
+You can extend the Lighthouse presets by adding the `extends` property. By default, `lighthouse:default` is asssumed, so it can be omited. There are two options available:
+
+[lighthouse:default](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default-config.js)\
+[lighthouse:full](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/full-config.js)
+
+**Example:** To change the device type from 'mobile' to 'desktop' mode, you could use:\
+`--lighthouse.extends lighthouse:default --lighthouse.settings.emulatedFormFactor desktop`
+
+To add multiple settings, repeat `--lighthouse.settings.*`.
+
+For more details, check out the [Lighthouse Configuration](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md) page.
 
 ## sitespeed.io version
 You need sitespeed.io 7.5 or later to run the plugin.
