@@ -29,9 +29,17 @@ async function launchChromeAndRunLighthouse(url, config, flags) {
       if (config && !config.extends) {
         config.extends = 'lighthouse:default';
       }
-      return lighthouse(url, Object.assign({}, { 
-        port: chrome.port, 
-      }, flags), config).then(results => {
+      return lighthouse(
+        url,
+        Object.assign(
+          {},
+          {
+            port: chrome.port
+          },
+          flags
+        ),
+        config
+      ).then(results => {
         return chrome.kill().then(() => results.lhr);
       });
     });
@@ -51,10 +59,13 @@ module.exports = {
 
     this.lightHouseOptions = options.lighthouse;
 
-    this.lighthouseFlags = Object.assign({}, !!options.debug && {
-      logLevel: 'verbose'
-    });
- 
+    this.lighthouseFlags = Object.assign(
+      {},
+      !!options.debug && {
+        logLevel: 'verbose'
+      }
+    );
+
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
