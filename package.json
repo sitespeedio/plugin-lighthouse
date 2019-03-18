@@ -24,7 +24,7 @@
     "pug-lint": "2.5.0"
   },
   "dependencies": {
-    "lighthouse": "^4.0.0"
+    "lighthouse": "^4.2.0"
   },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",
