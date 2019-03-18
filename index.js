@@ -22,14 +22,24 @@ const defaultChromeSettings = {
   ]
 };
 
-async function launchChromeAndRunLighthouse(url, config) {
+async function launchChromeAndRunLighthouse(url, config, flags) {
   return chromeLauncher
     .launch({ chromeFlags: defaultChromeSettings.chromeFlags })
     .then(chrome => {
       if (config && !config.extends) {
         config.extends = 'lighthouse:default';
       }
-      return lighthouse(url, { port: chrome.port }, config).then(results => {
+      return lighthouse(
+        url,
+        Object.assign(
+          {},
+          {
+            port: chrome.port
+          },
+          flags
+        ),
+        config
+      ).then(results => {
         return chrome.kill().then(() => results.lhr);
       });
     });
@@ -48,6 +58,14 @@ module.exports = {
     );
 
     this.lightHouseOptions = options.lighthouse;
+
+    this.lighthouseFlags = Object.assign(
+      {},
+      !!options.debug && {
+        logLevel: 'verbose'
+      }
+    );
+
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
@@ -81,7 +99,8 @@ module.exports = {
               try {
                 const result = await launchChromeAndRunLighthouse(
                   urlAndGroup.url,
-                  this.lightHouseOptions
+                  this.lightHouseOptions,
+                  this.lighthouseFlags
                 );
                 log.info('Got Lighthouse metrics');
                 log.verbose('Result from Lightouse:%:2j', result);
@@ -147,7 +166,8 @@ module.exports = {
           try {
             const result = await launchChromeAndRunLighthouse(
               url,
-              this.lightHouseOptions
+              this.lightHouseOptions,
+              this.lighthouseFlags
             );
             log.info('Got Lighthouse metrics');
             log.verbose('Result from Lightouse:%:2j', result);
