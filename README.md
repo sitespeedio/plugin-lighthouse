@@ -50,5 +50,8 @@ To add multiple settings, repeat `--lighthouse.settings.*`.
 
 For more details, check out the [Lighthouse Configuration](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md) page.
 
+## Debug
+If you need logging from Lighthouse you can turn on verbose logging by adding `--verbose` to sitespeed.io.
+
 ## sitespeed.io version
 You need sitespeed.io 7.5 or later to run the plugin.
