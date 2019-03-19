@@ -59,12 +59,7 @@ module.exports = {
 
     this.lightHouseOptions = options.lighthouse;
 
-    this.lighthouseFlags = Object.assign(
-      {},
-      !!options.debug && {
-        logLevel: 'verbose'
-      }
-    );
+    this.lighthouseFlags = options.verbose > 0 ? { logLevel: 'verbose' } : {};
 
     this.usingBrowsertime = false;
     this.summaries = 0;
