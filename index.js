@@ -40,7 +40,8 @@ async function launchChromeAndRunLighthouse(url, config, flags) {
         ),
         config
       ).then(results => {
-        return chrome.kill().then(() => results.lhr);
+        const lhrAndReport = { lhr: results.lhr, report: results.report };
+        return chrome.kill().then(() => lhrAndReport);
       });
     });
 }
@@ -64,6 +65,8 @@ module.exports = {
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
+
+    this.storageManager = context.storageManager;
 
     context.filterRegistry.registerFilterForType(
       DEFAULT_SUMMARY_METRICS,
@@ -98,9 +101,16 @@ module.exports = {
                   this.lighthouseFlags
                 );
                 log.info('Got Lighthouse metrics');
-                log.verbose('Result from Lightouse:%:2j', result);
+                log.verbose('Result from Lightouse:%:2j', result.lhr);
                 queue.postMessage(
-                  make('lighthouse.pageSummary', result, {
+                  make('lighthouse.pageSummary', result.lhr, {
+                    url: urlAndGroup.url,
+                    group: urlAndGroup.group
+                  })
+                );
+                log.verbose('Report from Lightouse:%:2j', result.report);
+                queue.postMessage(
+                  make('lighthouse.report', result.report, {
                     url: urlAndGroup.url,
                     group: urlAndGroup.group
                   })
@@ -165,9 +175,16 @@ module.exports = {
               this.lighthouseFlags
             );
             log.info('Got Lighthouse metrics');
-            log.verbose('Result from Lightouse:%:2j', result);
+            log.verbose('Result from Lightouse:%:2j', result.lhr);
             queue.postMessage(
-              make('lighthouse.pageSummary', result, {
+              make('lighthouse.pageSummary', result.lhr, {
+                url,
+                group
+              })
+            );
+            log.verbose('Report from Lightouse:%:2j', result.report);
+            queue.postMessage(
+              make('lighthouse.report', result.report, {
                 url,
                 group
               })
@@ -188,6 +205,14 @@ module.exports = {
             );
           }
         }
+        break;
+      }
+      case 'lighthouse.report': {
+        return this.storageManager.writeDataForUrl(
+          message.data,
+          'lighthouse',
+          message.url
+        );
       }
     }
   }
