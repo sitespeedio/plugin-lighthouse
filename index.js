@@ -174,7 +174,6 @@ module.exports = {
               this.lightHouseOptions,
               this.lighthouseFlags
             );
-            log.info('Got Lighthouse metrics');
             log.verbose('Result from Lightouse:%:2j', result.lhr);
             queue.postMessage(
               make('lighthouse.pageSummary', result.lhr, {
@@ -210,7 +209,13 @@ module.exports = {
       case 'lighthouse.report': {
         return this.storageManager.writeDataForUrl(
           message.data,
-          'lighthouse',
+          `lighthouse.${
+            this.lightHouseOptions &&
+            this.lightHouseOptions.settings &&
+            this.lightHouseOptions.settings.output
+              ? this.lightHouseOptions.settings.output
+              : 'json'
+          }`,
           message.url
         );
       }
