@@ -21,6 +21,14 @@ If you want to run Lighthouse with your other sitespeed.io test, follow the inst
 
 The Lighthouse tests will run after Browsertime finished and run Chrome headless.
 
+## Lighthouse reports
+By default, it will generate `lighthouse` report json-files in `/pages/YOURPAGE/data`.
+
+This examples will allow you to set the Lighthouse report type (output type):
+
+`--lighthouse.extends lighthouse:default --lighthouse.settings.output html` for html-reports,
+`--lighthouse.extends lighthouse:default --lighthouse.settings.output csv` for csv-reports.
+
 ## Data to Graphite/InfluxDB
 The plugin will automatically send the performance, pwa, best practice, accessibility and SEO score to Graphite/InfluxDB. 
 
