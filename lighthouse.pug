@@ -2,6 +2,8 @@
 
 a
 h2 Lighthouse (version #{lh.lighthouseVersion})
+p Full Lighthouse report is available 
+  a(href=`./data/lighthouse.${(options.lighthouse && options.lighthouse.settings && options.lighthouse.settings.output) ? options.lighthouse.settings.output : "json"}`) here
 
 h3  Score 
 table
