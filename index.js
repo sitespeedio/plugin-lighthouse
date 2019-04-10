@@ -2,8 +2,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const lighthouse = require('lighthouse');
-const chromeLauncher = require('chrome-launcher');
+const omit = require('object.omit');
+const runAudit = require('./runAudit');
 
 const DEFAULT_SUMMARY_METRICS = [
   'categories.seo.score',
@@ -12,39 +12,6 @@ const DEFAULT_SUMMARY_METRICS = [
   'categories.accessibility.score',
   'categories.best-practices.score'
 ];
-
-const defaultChromeSettings = {
-  chromeFlags: [
-    '--no-sandbox',
-    '--headless',
-    '--disable-gpu',
-    '--ignore-certificate-errors'
-  ]
-};
-
-async function launchChromeAndRunLighthouse(url, config, flags) {
-  return chromeLauncher
-    .launch({ chromeFlags: defaultChromeSettings.chromeFlags })
-    .then(chrome => {
-      if (config && !config.extends) {
-        config.extends = 'lighthouse:default';
-      }
-      return lighthouse(
-        url,
-        Object.assign(
-          {},
-          {
-            port: chrome.port
-          },
-          flags
-        ),
-        config
-      ).then(results => {
-        const lhrAndReport = { lhr: results.lhr, report: results.report };
-        return chrome.kill().then(() => lhrAndReport);
-      });
-    });
-}
 
 module.exports = {
   name() {
@@ -58,9 +25,13 @@ module.exports = {
       'utf8'
     );
 
-    this.lightHouseOptions = options.lighthouse;
+    this.lightHouseConfig =
+      options.lighthouse && omit(options.lighthouse, 'preScript');
 
     this.lighthouseFlags = options.verbose > 0 ? { logLevel: 'verbose' } : {};
+
+    this.lighthousePreScript =
+      options.lighthouse && options.lighthouse.preScript;
 
     this.usingBrowsertime = false;
     this.summaries = 0;
@@ -95,11 +66,12 @@ module.exports = {
                 urlAndGroup.url
               );
               try {
-                const result = await launchChromeAndRunLighthouse(
-                  urlAndGroup.url,
-                  this.lightHouseOptions,
-                  this.lighthouseFlags
-                );
+                const result = await runAudit({
+                  url: urlAndGroup.url,
+                  lightHouseConfig: this.lightHouseConfig,
+                  lighthouseFlags: this.lighthouseFlags,
+                  lighthousePreScript: this.lighthousePreScript
+                });
                 log.info('Got Lighthouse metrics');
                 log.verbose('Result from Lightouse:%:2j', result.lhr);
                 queue.postMessage(
@@ -169,11 +141,12 @@ module.exports = {
           const group = message.group;
           log.info('Start collecting Lighthouse result for %s', url);
           try {
-            const result = await launchChromeAndRunLighthouse(
+            const result = await runAudit({
               url,
-              this.lightHouseOptions,
-              this.lighthouseFlags
-            );
+              lightHouseConfig: this.lightHouseConfig,
+              lighthouseFlags: this.lighthouseFlags,
+              lighthousePreScript: this.lighthousePreScript
+            });
             log.verbose('Result from Lightouse:%:2j', result.lhr);
             queue.postMessage(
               make('lighthouse.pageSummary', result.lhr, {
@@ -210,10 +183,10 @@ module.exports = {
         return this.storageManager.writeDataForUrl(
           message.data,
           `lighthouse.${
-            this.lightHouseOptions &&
-            this.lightHouseOptions.settings &&
-            this.lightHouseOptions.settings.output
-              ? this.lightHouseOptions.settings.output
+            this.lightHouseConfig &&
+            this.lightHouseConfig.settings &&
+            this.lightHouseConfig.settings.output
+              ? this.lightHouseConfig.settings.output
               : 'json'
           }`,
           message.url
