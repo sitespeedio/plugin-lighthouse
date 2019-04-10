@@ -1,2 +1,8 @@
-node_modules
+.idea
 .vscode
+.DS_Store
+.npm
+.env
+npm-debug.log
+node_modules
+sitespeed-result
