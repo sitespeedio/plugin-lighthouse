@@ -25,7 +25,7 @@ npm install sitespeedio/plugin-lighthouse
 2) Within the folder where sitespeed.io has been installed, run the following:
 
 ```bash
-./node_modules/sitespeed.io/bin/sitespeed.js --plugins.add ../../plugin-lighthouse/ https://www.sitespeed.io/ -n 1
+./node_modules/sitespeed.io/bin/sitespeed.js --plugins.add ./node_modules/@sitespeed.io/plugin-lighthouse/ https://www.sitespeed.io/ -n 1
 ```
 
 
