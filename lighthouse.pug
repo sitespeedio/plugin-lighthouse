@@ -2,44 +2,6 @@
 
 a
 h2 Lighthouse (version #{lh.lighthouseVersion})
-p Full Lighthouse report is available 
-  a(href=`./data/lighthouse.${(options.lighthouse && options.lighthouse.settings && options.lighthouse.settings.output) ? options.lighthouse.settings.output : "json"}`) here
 
-h3  Score 
-table
-  thead
-      tr
-        th #{lh.categories.performance.title}
-        th #{lh.categories.pwa.title} 
-        th #{lh.categories['best-practices'].title}
-        th #{lh.categories.accessibility.title} 
-        th #{lh.categories.seo.title}
-      tr  
-        td #{lh.categories.performance.score * 100}
-        td #{lh.categories.pwa.score * 100} 
-        td #{lh.categories['best-practices'].score * 100}
-        td #{lh.categories.accessibility.score * 100} 
-        td #{lh.categories.seo.score * 100}
-
-h3 Room for improvement
-p Warning: All links in the description will lead you to developers.google.com 
-.responsive
-  table  
-    thead
-        tr
-            th Title
-            th Value
-            th Score
-    each value, key in lh.audits
-      if value.score && value.score < 1 || value.score === 0 
-        tr
-            td 
-              b #{value.title}
-            td #{value.displayValue}
-            td #{value.score * 100}
-        tr
-          td(colspan=3) !{markdown.toHTML(value.description)}  
-            if (value.explanation)
-              p !{markdown.toHTML(value.explanation)}
-
-            
+div(style='position:relative;padding-top:56.25%;')
+  iframe(src='./data/lighthouse.html', frameborder='0', allowfullscreen='', style='position:absolute;top:0;left:0;width:100%;height:100%;')            

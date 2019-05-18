@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const omit = require('object.omit');
+const merge = require('lodash.merge');
 const runAudit = require('./runAudit');
 
 const DEFAULT_SUMMARY_METRICS = [
@@ -12,6 +13,12 @@ const DEFAULT_SUMMARY_METRICS = [
   'categories.accessibility.score',
   'categories.best-practices.score'
 ];
+
+const defaultConfig = {
+  settings: {
+    output: 'html'
+  }
+};
 
 module.exports = {
   name() {
@@ -28,11 +35,12 @@ module.exports = {
     this.lightHouseConfig =
       options.lighthouse && omit(options.lighthouse, 'preScript');
 
+    this.lightHouseConfig = merge(defaultConfig, this.lightHouseConfig);
+
     this.lighthouseFlags = options.verbose > 0 ? { logLevel: 'verbose' } : {};
 
     this.lighthousePreScript =
       options.lighthouse && options.lighthouse.preScript;
-
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
