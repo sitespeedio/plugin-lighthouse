@@ -38,7 +38,7 @@
     "pug-lint": "2.5.0"
   },
   "dependencies": {
-    "lighthouse": "^4.2.0",
+    "lighthouse": "^5.0.0",
     "object.omit": "^3.0.0",
     "puppeteer": "^1.14.0"
   },
