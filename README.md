@@ -16,6 +16,19 @@ npm install
 bin/sitespeed.js --plugins.add ../plugin-lighthouse/ https://www.sitespeed.io/ -n 1
 ```
 
+An alternative approach to installing:
+
+1) Install using NPM, directly accessing GitHub rather than the NPM registry:
+```bash
+npm install sitespeedio/plugin-lighthouse
+```
+2) Within the folder where sitespeed.io has been installed, run the following:
+
+```bash
+./node_modules/sitespeed.io/bin/sitespeed.js --plugins.add ./node_modules/@sitespeed.io/plugin-lighthouse/ https://www.sitespeed.io/ -n 1
+```
+
+
 ## Run in production
 If you want to run Lighthouse with your other sitespeed.io test, follow the instructions in the [add a plugin docs](https://www.sitespeed.io/documentation/sitespeed.io/plugins/#add-a-plugin).
 
