@@ -30,17 +30,12 @@ npm install sitespeedio/plugin-lighthouse
 
 
 ## Run in production
-If you want to run Lighthouse with your other sitespeed.io test, follow the instructions in the [add a plugin docs](https://www.sitespeed.io/documentation/sitespeed.io/plugins/#add-a-plugin).
+If you want to run Lighthouse with your other sitespeed.io test, follow the instructions in the [add a plugin docs](https://www.sitespeed.io/documentation/sitespeed.io/plugins/#add-a-plugin) or use the sitespeed.io +1 container. Read the [documentation](https://www.sitespeed.io/documentation/sitespeed.io/lighthouse/).
 
 The Lighthouse tests will run after Browsertime finished and run Chrome headless.
 
 ## Lighthouse reports
-By default, it will generate `lighthouse` report json-files in `/pages/YOURPAGE/data`.
-
-This examples will allow you to set the Lighthouse report type (output type):
-
-`--lighthouse.extends lighthouse:default --lighthouse.settings.output html` for html-reports,
-`--lighthouse.extends lighthouse:default --lighthouse.settings.output csv` for csv-reports.
+By default, it will generate `lighthouse` HTML-report in `/pages/YOURPAGE/data` that is iframed into the sitespeed.io result
 
 ## Data to Graphite/InfluxDB
 The plugin will automatically send the performance, pwa, best practice, accessibility and SEO score to Graphite/InfluxDB. 
@@ -57,6 +52,9 @@ Search for **lighthouse.pageSummary.** there you will have all the metrics that 
 The look at the docs on how you can send them: [https://www.sitespeed.io/documentation/sitespeed.io/metrics/#add-a-metric](https://www.sitespeed.io/documentation/sitespeed.io/metrics/#add-a-metric).
 
 ## Configuration
+
+Lighthouse use "provided" network throttling by default, meaning it will use the same one as sitespeed.io.
+
 You can pass config to Lighthouse using the `--lighthouse` CLI flag. Since this plugin using the Lighthouse node module and not the CLI, some options from the CLI API are not available. You can find a list of supported flags by checking out the [SharedFlagsSetting](https://github.com/GoogleChrome/lighthouse/blob/41bc409deddb44dd607d2606b7e57e1d239641a7/types/externs.d.ts) interface in the Lighthouse repository.
 
 You can extend the Lighthouse presets by adding the `extends` property. By default, `lighthouse:default` is asssumed, so it can be omited. There are two options available:
@@ -66,6 +64,8 @@ You can extend the Lighthouse presets by adding the `extends` property. By defau
 
 **Example:** To change the device type from 'mobile' to 'desktop' mode, you could use:\
 `--lighthouse.extends lighthouse:default --lighthouse.settings.emulatedFormFactor desktop`
+
+If you want to change to use the simulated throttling: `--lighthouse.settings.throttlingMethod simulate`
 
 To add multiple settings, repeat `--lighthouse.settings.*`.
 
