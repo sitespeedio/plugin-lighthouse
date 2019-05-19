@@ -16,7 +16,8 @@ const DEFAULT_SUMMARY_METRICS = [
 
 const defaultConfig = {
   settings: {
-    output: 'html'
+    output: 'html',
+    throttlingMethod: 'provided'
   }
 };
 
