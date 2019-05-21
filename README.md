@@ -53,7 +53,7 @@ The look at the docs on how you can send them: [https://www.sitespeed.io/documen
 
 ## Configuration
 
-Lighthouse use "provided" network throttling by default, meaning it will use the same one as sitespeed.io.
+Lighthouse use "simulated" network throttling by default.
 
 You can pass config to Lighthouse using the `--lighthouse` CLI flag. Since this plugin using the Lighthouse node module and not the CLI, some options from the CLI API are not available. You can find a list of supported flags by checking out the [SharedFlagsSetting](https://github.com/GoogleChrome/lighthouse/blob/41bc409deddb44dd607d2606b7e57e1d239641a7/types/externs.d.ts) interface in the Lighthouse repository.
 
