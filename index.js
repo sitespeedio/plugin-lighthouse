@@ -98,7 +98,8 @@ module.exports = {
               } catch (e) {
                 log.error(
                   'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
-                  urlAndGroup.url
+                  urlAndGroup.url,
+                  e
                 );
                 queue.postMessage(
                   make(
@@ -172,7 +173,8 @@ module.exports = {
           } catch (e) {
             log.error(
               'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
-              url
+              url,
+              e
             );
             queue.postMessage(
               make(
