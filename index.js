@@ -5,8 +5,9 @@ const path = require('path');
 const omit = require('object.omit');
 const merge = require('lodash.merge');
 const runAudit = require('./runAudit');
+const Aggregator = require('./aggregator');
 
-const DEFAULT_SUMMARY_METRICS = [
+const DEFAULT_SINGLE_RUN_SUMMARY_METRICS = [
   'categories.seo.score',
   'categories.performance.score',
   'categories.pwa.score',
@@ -14,10 +15,19 @@ const DEFAULT_SUMMARY_METRICS = [
   'categories.best-practices.score'
 ];
 
+const DEFAULT_MULTI_RUN_SUMMARY_METRICS = [
+  'categories.seo.*',
+  'categories.performance.*',
+  'categories.pwa.*',
+  'categories.accessibility.*',
+  'categories.best-practices.*'
+];
+
 const defaultConfig = {
   settings: {
     output: 'html'
-  }
+  },
+  iterations: 1
 };
 
 module.exports = {
@@ -31,6 +41,7 @@ module.exports = {
       path.resolve(__dirname, 'lighthouse.pug'),
       'utf8'
     );
+    this.aggregator = new Aggregator(context.statsHelpers, this.log);
 
     this.lightHouseConfig =
       options.lighthouse && omit(options.lighthouse, 'preScript');
@@ -46,11 +57,18 @@ module.exports = {
     this.urls = [];
 
     this.storageManager = context.storageManager;
-
-    context.filterRegistry.registerFilterForType(
-      DEFAULT_SUMMARY_METRICS,
-      'lighthouse.pageSummary'
-    );
+    this.filterRegistry = context.filterRegistry;
+    if (this.lightHouseConfig.iterations === 1) {
+      context.filterRegistry.registerFilterForType(
+        DEFAULT_SINGLE_RUN_SUMMARY_METRICS,
+        'lighthouse.pageSummary'
+      );
+    } else {
+      context.filterRegistry.registerFilterForType(
+        DEFAULT_MULTI_RUN_SUMMARY_METRICS,
+        'lighthouse.pageSummary'
+      );
+    }
   },
   async processMessage(message, queue) {
     const make = this.make;
@@ -69,48 +87,7 @@ module.exports = {
           this.summaries++;
           if (this.summaries === this.urls.length) {
             for (let urlAndGroup of this.urls) {
-              log.info(
-                'Will collect Lighthouse metrics for %s',
-                urlAndGroup.url
-              );
-              try {
-                const result = await runAudit({
-                  url: urlAndGroup.url,
-                  lightHouseConfig: this.lightHouseConfig,
-                  lighthouseFlags: this.lighthouseFlags,
-                  lighthousePreScript: this.lighthousePreScript
-                });
-                log.info('Got Lighthouse metrics');
-                log.verbose('Result from Lightouse:%:2j', result.lhr);
-                queue.postMessage(
-                  make('lighthouse.pageSummary', result.lhr, {
-                    url: urlAndGroup.url,
-                    group: urlAndGroup.group
-                  })
-                );
-                log.verbose('Report from Lightouse:%:2j', result.report);
-                queue.postMessage(
-                  make('lighthouse.report', result.report, {
-                    url: urlAndGroup.url,
-                    group: urlAndGroup.group
-                  })
-                );
-              } catch (e) {
-                log.error(
-                  'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
-                  urlAndGroup.url,
-                  e
-                );
-                queue.postMessage(
-                  make(
-                    'error',
-                    'Lighthouse got the following errors: ' + JSON.stringify(e),
-                    {
-                      url: urlAndGroup.url
-                    }
-                  )
-                );
-              }
+              queue.postMessage(make('lighthouse.audit', urlAndGroup));
             }
           }
         }
@@ -148,26 +125,40 @@ module.exports = {
         } else {
           const url = message.url;
           const group = message.group;
-          log.info('Start collecting Lighthouse result for %s', url);
+          queue.postMessage(
+            make('lighthouse.audit', {
+              url,
+              group
+            })
+          );
+        }
+        break;
+      }
+
+      case 'lighthouse.audit': {
+        const { url, group } = message.data;
+        let result;
+        for (let i = 0; i < this.lightHouseConfig.iterations; i++) {
+          log.info(
+            'Start collecting Lighthouse result for %s iteration %d',
+            url,
+            i + 1
+          );
           try {
-            const result = await runAudit({
+            result = await runAudit({
               url,
               lightHouseConfig: this.lightHouseConfig,
               lighthouseFlags: this.lighthouseFlags,
               lighthousePreScript: this.lighthousePreScript
             });
             log.verbose('Result from Lightouse:%:2j', result.lhr);
-            queue.postMessage(
-              make('lighthouse.pageSummary', result.lhr, {
-                url,
-                group
-              })
-            );
+            this.aggregator.addToAggregate(result.lhr);
             log.verbose('Report from Lightouse:%:2j', result.report);
             queue.postMessage(
               make('lighthouse.report', result.report, {
                 url,
-                group
+                group,
+                iteration: i + 1
               })
             );
           } catch (e) {
@@ -187,12 +178,35 @@ module.exports = {
             );
           }
         }
+        if (this.lightHouseConfig.iterations > 1) {
+          const summary = this.filterRegistry.filterMessage({
+            type: 'lighthouse.pageSummary',
+            data: this.aggregator.summarize()
+          }).data;
+          queue.postMessage(
+            make(
+              'lighthouse.pageSummary',
+              merge(summary, {
+                iterations: this.lightHouseConfig.iterations
+              }),
+              { url, group }
+            )
+          );
+        } else {
+          queue.postMessage(
+            make(
+              'lighthouse.pageSummary',
+              merge(result.lhr, { iterations: 1 }),
+              { url, group }
+            )
+          );
+        }
         break;
       }
       case 'lighthouse.report': {
         return this.storageManager.writeDataForUrl(
           message.data,
-          `lighthouse.${
+          `lighthouse.${message.iteration}.${
             this.lightHouseConfig &&
             this.lightHouseConfig.settings &&
             this.lightHouseConfig.settings.output
