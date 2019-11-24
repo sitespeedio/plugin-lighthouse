@@ -7,7 +7,8 @@ const defaultChromeSettings = {
   args: ['--no-sandbox', '--disable-gpu']
 };
 
-const launchBrowser = async () => puppeteer.launch(defaultChromeSettings);
+const launchBrowser = async (puppeteerSettings) =>
+  puppeteer.launch({ ...defaultChromeSettings, ...puppeteerSettings });
 
 const closeBrowser = async browser => browser.close();
 
@@ -52,7 +53,8 @@ module.exports = async function runAudit({
   lighthouseFlags,
   lighthousePreScript
 }) {
-  const browser = await launchBrowser();
+  const puppeteerSettings = lightHouseConfig.puppeteer || {};
+  const browser = await launchBrowser(puppeteerSettings);
 
   if (lighthousePreScript) {
     await executePreScript({ browser, lighthousePreScript });
