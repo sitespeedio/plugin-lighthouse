@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
+const merge = require('lodash.merge');
 
 const defaultChromeSettings = {
   ignoreHTTPSErrors: true,
@@ -7,7 +8,8 @@ const defaultChromeSettings = {
   args: ['--no-sandbox', '--disable-gpu']
 };
 
-const launchBrowser = async () => puppeteer.launch(defaultChromeSettings);
+const launchBrowser = async puppeteerSettings =>
+  puppeteer.launch(merge(defaultChromeSettings, puppeteerSettings));
 
 const closeBrowser = async browser => browser.close();
 
@@ -52,7 +54,8 @@ module.exports = async function runAudit({
   lighthouseFlags,
   lighthousePreScript
 }) {
-  const browser = await launchBrowser();
+  const puppeteerSettings = lightHouseConfig.puppeteer || {};
+  const browser = await launchBrowser(puppeteerSettings);
 
   if (lighthousePreScript) {
     await executePreScript({ browser, lighthousePreScript });
