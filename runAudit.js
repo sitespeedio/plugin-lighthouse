@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const lighthouse = require('lighthouse');
+const merge = require('lodash.merge');
 
 const defaultChromeSettings = {
   ignoreHTTPSErrors: true,
@@ -8,7 +9,7 @@ const defaultChromeSettings = {
 };
 
 const launchBrowser = async (puppeteerSettings) =>
-  puppeteer.launch({ ...defaultChromeSettings, ...puppeteerSettings });
+  puppeteer.launch(merge(defaultChromeSettings, puppeteerSettings));
 
 const closeBrowser = async browser => browser.close();
 
