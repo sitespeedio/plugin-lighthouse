@@ -100,7 +100,7 @@ For more details, check out the [Lighthouse Configuration](https://github.com/Go
 
 Lighthouse plugin launches a separate chrome using [`puppeteer`](https://github.com/puppeteer/puppeteer). The default settings uses headless mode.
 
-There is high variance with lighthouse issue with headless mode. Consider removing headless mode by setting `headless: false` and running sitespeed with a Xvfb server for more consistent results.
+There is [high variance with Lighthouse issue with headless mode](https://github.com/sitespeedio/plugin-lighthouse/issues/38). Consider removing headless mode by setting `headless: false` and running sitespeed.io with a Xvfb server for more consistent results.
 
 More info about [configuring puppeteer here](https://github.com/puppeteer/puppeteer#default-runtime-settings).
 
