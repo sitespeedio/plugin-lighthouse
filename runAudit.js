@@ -8,7 +8,7 @@ const defaultChromeSettings = {
   args: ['--no-sandbox', '--disable-gpu']
 };
 
-const launchBrowser = async (puppeteerSettings) =>
+const launchBrowser = async puppeteerSettings =>
   puppeteer.launch(merge(defaultChromeSettings, puppeteerSettings));
 
 const closeBrowser = async browser => browser.close();
