@@ -10,30 +10,26 @@ class Aggregator {
     this.stats = {};
   }
 
+  _pushStats(path, value) {
+    if (!(value > 0)) {
+      this.log.info(`stat ${path} was empty, skipping`);
+      return;
+    }
+    this.statsHelpers.pushStats(this.stats, path, value);
+  }
+
   addToAggregate(result) {
     forEach(result.categories, category => {
-      this.statsHelpers.pushStats(
-        this.stats,
-        ['categories', category.id],
-        category.score
-      );
+      this._pushStats(['categories', category.id], category.score);
     });
 
     forEach(result.audits, audit => {
       switch (audit.scoreDisplayMode) {
         case 'numeric':
-          this.statsHelpers.pushStats(
-            this.stats,
-            ['audits', audit.id],
-            audit.numericValue
-          );
+          this._pushStats(['audits', audit.id], audit.numericValue);
           break;
         case 'binary':
-          this.statsHelpers.pushStats(
-            this.stats,
-            ['audits', audit.id],
-            audit.score
-          );
+          this._pushStats(['audits', audit.id], audit.score);
           break;
         default:
           break;
