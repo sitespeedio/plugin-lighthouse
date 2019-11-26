@@ -31,6 +31,7 @@ const defaultConfig = {
 };
 
 module.exports = {
+  concurrency: 1,
   name() {
     return 'lighthouse';
   },
