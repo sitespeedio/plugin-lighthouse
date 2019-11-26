@@ -152,9 +152,9 @@ module.exports = {
               lighthouseFlags: this.lighthouseFlags,
               lighthousePreScript: this.lighthousePreScript
             });
-            log.verbose('Result from Lightouse:%:2j', result.lhr);
+            log.verbose('Result from Lighthouse:%:2j', result.lhr);
             this.aggregator.addToAggregate(result.lhr);
-            log.verbose('Report from Lightouse:%:2j', result.report);
+            log.verbose('Report from Lighthouse:%:2j', result.report);
             queue.postMessage(
               make('lighthouse.report', result.report, {
                 url,
