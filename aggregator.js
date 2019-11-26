@@ -11,7 +11,7 @@ class Aggregator {
   }
 
   _pushStats(path, value) {
-    if (!(value > 0)) {
+    if (!value) {
       this.log.info(`stat ${path} was empty, skipping`);
       return;
     }
