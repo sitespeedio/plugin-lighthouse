@@ -11,8 +11,8 @@ class Aggregator {
   }
 
   _pushStats(path, value) {
-    if (!value) {
-      this.log.info(`stat ${path} was empty, skipping`);
+    if (value === undefined) {
+      this.log.info(`stat ${path} was undefined, skipping`);
       return;
     }
     this.statsHelpers.pushStats(this.stats, path, value);
