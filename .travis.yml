@@ -10,6 +10,7 @@ before_install:
 script:
   - npm run lint
   - sitespeed.io --plugins.add . https://www.sitespeed.io/ -n 1 --headless
+  - sitespeed.io --plugins.add . https://www.sitespeed.io/ https://www.sitespeed.io/documentation/ -n 1 --headless
   - sitespeed.io --plugins.add . https://www.sitespeed.io/ -n 1 --headless --lighthouse.preScript ./test/preScriptTest.js
 notifications:
   slack:
