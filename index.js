@@ -20,7 +20,14 @@ const DEFAULT_MULTI_RUN_SUMMARY_METRICS = [
   'categories.performance.*',
   'categories.pwa.*',
   'categories.accessibility.*',
-  'categories.best-practices.*'
+  'categories.best-practices.*',
+  'audits.first-contentful-paint.*',
+  'audits.first-meaningful-paint.*',
+  'audits.first-cpu-idle.*',
+  'audits.speed-index.*',
+  'audits.estimated-input-latency.*',
+  'audits.max-potential-fid.*',
+  'audits.interactive.*'
 ];
 
 const defaultConfig = {
