@@ -42,7 +42,7 @@ module.exports = {
       path.resolve(__dirname, 'lighthouse.pug'),
       'utf8'
     );
-    this.aggregator = new Aggregator(context.statsHelpers, this.log);
+    this.statsHelpers = context.statsHelpers;
 
     this.lightHouseConfig =
       options.lighthouse && omit(options.lighthouse, 'preScript');
@@ -137,6 +137,7 @@ module.exports = {
       }
 
       case 'lighthouse.audit': {
+        this.aggregator = new Aggregator(this.statsHelpers, this.log);
         const { url, group } = message.data;
         let result;
         for (let i = 0; i < this.lightHouseConfig.iterations; i++) {
