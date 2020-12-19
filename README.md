@@ -71,7 +71,6 @@ You can configure either through `--lighthouse.*` CLI arguments, or through site
   },
   // lighthouse node module SharedFlags settings, see below for notes
   "settings": {
-    "emulatedFormFactor": "mobile",
     "throttlingMethod": "simulate",
     // other lighthouse settings
   }
@@ -90,7 +89,7 @@ You can extend the Lighthouse presets by adding the `extends` property. By defau
 Since this plugin using the Lighthouse node module and not the CLI, some options from the CLI API are not available. You can find a list of supported flags by checking out the [SharedFlagsSetting](https://github.com/GoogleChrome/lighthouse/blob/41bc409deddb44dd607d2606b7e57e1d239641a7/types/externs.d.ts) interface in the Lighthouse repository.
 
 **Example:** To change the device type from 'mobile' to 'desktop' mode, you could use:\
-`--lighthouse.extends lighthouse:default --lighthouse.settings.emulatedFormFactor desktop`
+`--lighthouse.extends lighthouse:default --lighthouse.settings.preset desktop`
 
 Lighthouse use "simulated" network throttling by default. If you want to change to use the simulated throttling: `--lighthouse.settings.throttlingMethod simulate`
 
