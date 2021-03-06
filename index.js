@@ -56,6 +56,7 @@ module.exports = {
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
+    this.alias = {};
 
     this.storageManager = context.storageManager;
     this.filterRegistry = context.filterRegistry;
@@ -80,6 +81,10 @@ module.exports = {
         // We know we will use Browsertime so we wanna keep track of Browseertime summaries
         this.usingBrowsertime = true;
         log.info('Will run Lighthouse tests after Browsertime has finished');
+        break;
+      }
+      case 'browsertime.alias': {
+        this.alias[message.url] = message.data;
         break;
       }
 
@@ -215,7 +220,9 @@ module.exports = {
               ? this.lightHouseConfig.settings.output
               : 'json'
           }`,
-          message.url
+          message.url,
+          undefined,
+          this.alias[message.url]
         );
       }
     }
