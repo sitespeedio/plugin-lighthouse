@@ -12,7 +12,11 @@ const DEFAULT_SINGLE_RUN_SUMMARY_METRICS = [
   'categories.performance.score',
   'categories.pwa.score',
   'categories.accessibility.score',
-  'categories.best-practices.score'
+  'categories.best-practices.score',
+  'audits.first-contentful-paint.numericValue',
+  'audits.largest-contentful-paint.numericValue',
+  'audits.total-blocking-time.numericValue',
+  'audits.cumulative-layout-shift.numericValue'
 ];
 
 const DEFAULT_MULTI_RUN_SUMMARY_METRICS = [
