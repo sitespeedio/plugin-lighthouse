@@ -45,7 +45,7 @@
     "lodash.foreach": "^4.5.0",
     "lodash.get": "4.4.2",
     "lodash.set": "^4.3.2",
-    "lighthouse": "7.2.0",
+    "lighthouse": "7.3.0",
     "object.omit": "3.0.0",
     "puppeteer": "8.0.0"
   },
