@@ -1,6 +1,9 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Lighthouse plugin for sitespeed.io",
   "repository": {
     "type": "git",
