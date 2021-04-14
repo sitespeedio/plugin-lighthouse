@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const omit = require('object.omit');
 const merge = require('lodash.merge');
+const get = require('lodash.get');
 const runAudit = require('./runAudit');
 const Aggregator = require('./aggregator');
 
@@ -52,6 +53,15 @@ module.exports = {
       options.lighthouse && omit(options.lighthouse, 'preScript');
 
     this.lightHouseConfig = merge(defaultConfig, this.lightHouseConfig);
+    // Special handling since some configs are strings but need to be the correct type for Lighthouse
+    const mobileSetting = get(
+      this.lightHouseConfig,
+      'settings.screenEmulation.mobile',
+      true
+    );
+    if (mobileSetting === 'false') {
+      this.lightHouseConfig.settings.screenEmulation.mobile = false;
+    }
 
     this.lighthouseFlags = options.verbose > 0 ? { logLevel: 'verbose' } : {};
 
