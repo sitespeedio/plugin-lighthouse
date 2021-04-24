@@ -8,7 +8,7 @@ You can read more about sitespeed.io plugins [here](https://www.sitespeed.io/doc
 
 ## Maintainer needed
 We are looking for someone that can give some love to the Lighthouse plugin and do not have a problem working with Google products. You are probably using Lighthouse in your day to day. Ping us by [creating a issue](https://github.com/sitespeedio/plugin-lighthouse/issues/new)!
-## Test with current master
+## Test with current main
 
 If you have checked out as the same level as sitespeed.io you run it like this (else just change the path).
 
