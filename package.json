@@ -45,9 +45,9 @@
     "lodash.foreach": "^4.5.0",
     "lodash.get": "4.4.2",
     "lodash.set": "^4.3.2",
-    "lighthouse": "8.6.0",
+    "lighthouse": "9.0.0",
     "object.omit": "3.0.0",
-    "puppeteer": "10.4.0"
+    "puppeteer": "11.0.0"
   },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",
