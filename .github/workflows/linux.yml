@@ -20,7 +20,8 @@ jobs:
         cd .. 
         git clone https://github.com/sitespeedio/sitespeed.io.git
         cd sitespeed.io
-        npm install -g 
+        npm install -g
+        sitespeed.io --version
         cd ../plugin-lighthouse
         npm install
     - name: Lint
