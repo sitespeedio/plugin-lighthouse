@@ -25,6 +25,8 @@ jobs:
         npm install
     - name: Lint
       run: npm run lint
+    - name: Show working dir
+      run: pwd
     - name: Run tests using Lighthouse plugin
       run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/
     - name: Run tests using Lighthouse prescript
