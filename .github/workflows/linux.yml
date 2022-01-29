@@ -14,17 +14,16 @@ jobs:
     - name: Use Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: '12.x'
+        node-version: '16.x'
     - name: Install sitespeed.io
       run: |
-        cd .. 
-        git clone https://github.com/sitespeedio/sitespeed.io.git
-        cd sitespeed.io
-        npm install -g 
+        npm install sitespeed.io -g
         cd ../plugin-lighthouse
         npm install
     - name: Lint
       run: npm run lint
+    - name: Show sitespeed.io version
+      run: sitespeed.io --version
     - name: Run tests using Lighthouse plugin
       run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/
     - name: Run tests using Lighthouse prescript
