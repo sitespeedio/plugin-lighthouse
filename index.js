@@ -2,13 +2,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const omit = require('object.omit');
-const merge = require('lodash.merge');
-const get = require('lodash.get');
-const runAudit = require('./runAudit');
-const Aggregator = require('./aggregator');
+const runLighthouse = require('./runLighthouse');
+const desktopConfiguration = require('lighthouse/lighthouse-core/config/lr-desktop-config');
+const mobileConfiguration = require('lighthouse/lighthouse-core/config/lr-mobile-config');
 
-const DEFAULT_SINGLE_RUN_SUMMARY_METRICS = [
+// Metrics that will be passed on to Graphite/Influx DB
+const DEFAULT_SUMMARY_METRICS = [
   'categories.seo.score',
   'categories.performance.score',
   'categories.pwa.score',
@@ -19,21 +18,6 @@ const DEFAULT_SINGLE_RUN_SUMMARY_METRICS = [
   'audits.total-blocking-time.numericValue',
   'audits.cumulative-layout-shift.numericValue'
 ];
-
-const DEFAULT_MULTI_RUN_SUMMARY_METRICS = [
-  'categories.seo.*',
-  'categories.performance.*',
-  'categories.pwa.*',
-  'categories.accessibility.*',
-  'categories.best-practices.*'
-];
-
-const defaultConfig = {
-  settings: {
-    output: 'html'
-  },
-  iterations: 1
-};
 
 module.exports = {
   concurrency: 1,
@@ -49,24 +33,34 @@ module.exports = {
     );
     this.statsHelpers = context.statsHelpers;
 
-    this.lightHouseConfig =
-      options.lighthouse && omit(options.lighthouse, 'preScript');
-
-    this.lightHouseConfig = merge(defaultConfig, this.lightHouseConfig);
-    // Special handling since some configs are strings but need to be the correct type for Lighthouse
-    const mobileSetting = get(
-      this.lightHouseConfig,
-      'settings.screenEmulation.mobile',
-      true
-    );
-    if (mobileSetting === 'false') {
-      this.lightHouseConfig.settings.screenEmulation.mobile = false;
+    if (options.lighthouse && options.lighthouse.config) {
+      this.log.info(
+        'Will use Lighthouse configuration file: %s',
+        path.resolve(options.lighthouse.config)
+      );
+      this.lightHouseConfig = require(path.resolve(options.lighthouse.config));
+    } else {
+      if (options.mobile || options.android || options.ios) {
+        this.lightHouseConfig = mobileConfiguration;
+        this.log.info('Using default Lighthouse configuration for mobile');
+      } else {
+        this.log.info('Using default Lighthouse configuration for desktop');
+        this.lightHouseConfig = desktopConfiguration;
+      }
     }
 
-    this.lighthouseFlags = options.verbose > 0 ? { logLevel: 'verbose' } : {};
+    if (options.lighthouse && options.lighthouse.flags) {
+      this.log.info(
+        'Will use Lighthouse flags file: %s',
+        path.resolve(options.lighthouse.flags)
+      );
+      fs.readFileSync(path.resolve(options.lighthouse.flags), 'utf8');
+    } else {
+      this.lighthouseFlags = {};
+    }
 
-    this.lighthousePreScript =
-      options.lighthouse && options.lighthouse.preScript;
+    this.chromeFlags = ['--headless'];
+
     this.usingBrowsertime = false;
     this.summaries = 0;
     this.urls = [];
@@ -74,17 +68,10 @@ module.exports = {
 
     this.storageManager = context.storageManager;
     this.filterRegistry = context.filterRegistry;
-    if (this.lightHouseConfig.iterations === 1) {
-      context.filterRegistry.registerFilterForType(
-        DEFAULT_SINGLE_RUN_SUMMARY_METRICS,
-        'lighthouse.pageSummary'
-      );
-    } else {
-      context.filterRegistry.registerFilterForType(
-        DEFAULT_MULTI_RUN_SUMMARY_METRICS,
-        'lighthouse.pageSummary'
-      );
-    }
+    context.filterRegistry.registerFilterForType(
+      DEFAULT_SUMMARY_METRICS,
+      'lighthouse.pageSummary'
+    );
   },
   async processMessage(message, queue) {
     const make = this.make;
@@ -156,88 +143,56 @@ module.exports = {
       }
 
       case 'lighthouse.audit': {
-        this.aggregator = new Aggregator(this.statsHelpers, this.log);
         const { url, group } = message.data;
         let result;
-        for (let i = 0; i < this.lightHouseConfig.iterations; i++) {
-          log.info(
-            'Start collecting Lighthouse result for %s iteration %d',
+        log.info('Start collecting Lighthouse result for %s', url);
+        log.debug(
+          'Lighthouse flags %:2j , config %:2j , Chrome flags %:2j',
+          this.lighthouseFlags,
+          this.lightHouseConfig,
+          this.chromeFlags
+        );
+        try {
+          result = await runLighthouse(
             url,
-            i + 1
+            this.lighthouseFlags,
+            this.lightHouseConfig,
+            this.chromeFlags,
+            log
           );
-          try {
-            result = await runAudit({
+          log.verbose('Result from Lighthouse:%:2j', result.lhr);
+          log.verbose('Report from Lighthouse:%:2j', result.report);
+          await this.storageManager.writeDataForUrl(
+            result.report,
+            'lighthouse.html',
+            url,
+            undefined,
+            this.alias[url]
+          );
+          queue.postMessage(
+            make('lighthouse.report', result.report, {
               url,
-              lightHouseConfig: this.lightHouseConfig,
-              lighthouseFlags: this.lighthouseFlags,
-              lighthousePreScript: this.lighthousePreScript
-            });
-            log.verbose('Result from Lighthouse:%:2j', result.lhr);
-            this.aggregator.addToAggregate(result.lhr);
-            log.verbose('Report from Lighthouse:%:2j', result.report);
-            queue.postMessage(
-              make('lighthouse.report', result.report, {
-                url,
-                group,
-                iteration: i + 1
-              })
-            );
-          } catch (e) {
-            log.error(
-              'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?template=Bug_report.md',
+              group
+            })
+          );
+          queue.postMessage(
+            make('lighthouse.pageSummary', result.lhr, {
               url,
-              e
-            );
-            queue.postMessage(
-              make(
-                'error',
-                'Lighthouse got the following errors: ' + JSON.stringify(e),
-                {
-                  url
-                }
-              )
-            );
-          }
-        }
-        if (this.lightHouseConfig.iterations > 1) {
-          const summary = this.filterRegistry.filterMessage({
-            type: 'lighthouse.pageSummary',
-            data: this.aggregator.summarize()
-          }).data;
+              group
+            })
+          );
+        } catch (e) {
           queue.postMessage(
             make(
-              'lighthouse.pageSummary',
-              merge(summary, {
-                iterations: this.lightHouseConfig.iterations
-              }),
-              { url, group }
-            )
-          );
-        } else {
-          queue.postMessage(
-            make(
-              'lighthouse.pageSummary',
-              merge(result.lhr, { iterations: 1 }),
-              { url, group }
+              'error',
+              'Lighthouse got the following errors: ' + JSON.stringify(e),
+              {
+                url
+              }
             )
           );
         }
         break;
-      }
-      case 'lighthouse.report': {
-        return this.storageManager.writeDataForUrl(
-          message.data,
-          `lighthouse.${message.iteration}.${
-            this.lightHouseConfig &&
-            this.lightHouseConfig.settings &&
-            this.lightHouseConfig.settings.output
-              ? this.lightHouseConfig.settings.output
-              : 'json'
-          }`,
-          message.url,
-          undefined,
-          this.alias[message.url]
-        );
       }
     }
   }
