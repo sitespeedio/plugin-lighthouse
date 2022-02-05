@@ -54,7 +54,9 @@ module.exports = {
         'Will use Lighthouse flags file: %s',
         path.resolve(options.lighthouse.flags)
       );
-      fs.readFileSync(path.resolve(options.lighthouse.flags), 'utf8');
+      this.lighthouseFlags = JSON.parse(
+        fs.readFileSync(path.resolve(options.lighthouse.flags), 'utf8')
+      );
     } else {
       this.lighthouseFlags = {};
     }
