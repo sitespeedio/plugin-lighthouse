@@ -1,5 +1,9 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## UNRELEASED
+### Fixed
+* Catch and log if Chrome cannot start [#97](https://github.com/sitespeedio/plugin-lighthouse/pull/97).
+* More generous Chrome flags by default to make Chrome work in Docker [#98](https://github.com/sitespeedio/plugin-lighthouse/pull/98).
 ## 9.3.1 - 2022-02-07
 ### Breaking changes
 * In the new version we drop support for the following:
