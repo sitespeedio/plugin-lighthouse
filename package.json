@@ -44,13 +44,8 @@
     "pug-lint": "2.6.0"
   },
   "dependencies": {
-    "lodash.merge": "4.6.2",
-    "lodash.foreach": "^4.5.0",
-    "lodash.get": "4.4.2",
-    "lodash.set": "^4.3.2",
-    "lighthouse": "9.2.0",
-    "object.omit": "3.0.0",
-    "puppeteer": "13.1.2"
+    "chrome-launcher": "0.14.1",
+    "lighthouse": "9.3.1"
   },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",

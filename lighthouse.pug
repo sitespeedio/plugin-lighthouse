@@ -1,44 +1,5 @@
-- const lh = pageInfo.data.lighthouse.pageSummary
-- const iterations = lh.iterations
+h2 Lighthouse (version #{pageInfo.data.lighthouse.pageSummary.lighthouseVersion})
 
-mixin tableHeader(title)
-  thead
-    th(colspan=6) #{title}
-  thead
-    th Name
-    th Median
-    th Mean
-    th Min
-    th p90
-    th Max
+div(style='position:relative;padding-top:56.25%;')
+  iframe(src='./data/lighthouse.html', frameborder='0', allowfullscreen='', style='position:absolute;top:0;left:0;width:100%;height:100%;')
 
-mixin tableDataRow(stats, statName)
-  tr
-    td #{statName}
-    td #{stats.median}
-    td #{stats.mean}
-    td #{stats.min}
-    td #{stats.p90}
-    td #{stats.max}
-
-if iterations === 1
-  h2 Lighthouse (version #{lh.lighthouseVersion})
-
-  div(style='position:relative;padding-top:56.25%;')
-    iframe(src='./data/lighthouse.1.html', frameborder='0', allowfullscreen='', style='position:absolute;top:0;left:0;width:100%;height:100%;')
-else
-  - var i = 1;
-  span Lighthouse runs:
-  while  i <= iterations
-    a(href=`./data/lighthouse.${i}.html`) [#{i}]
-    |
-    - i++
-  table
-    if lh.categories
-      +tableHeader('Categories')
-      each stats, category in lh.categories
-        +tableDataRow(stats, category)
-    if lh.audits
-      +tableHeader('Audits')
-      each stats, audit in lh.audits
-        +tableDataRow(stats, audit)

@@ -26,5 +26,13 @@ jobs:
       run: sitespeed.io --version
     - name: Run tests using Lighthouse plugin
       run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/
-    - name: Run tests using Lighthouse prescript
-      run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/ --lighthouse.preScript ./test/preScriptTest.js
+    - name: Run tests using Lighthouse plugin as mobile
+      run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/ --mobile
+    - name: Run tests with configuration file
+      run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/ --lighthouse.config ./test/config.js
+    - name: Run tests with flag file
+      run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/ --lighthouse.flags ./test/flags.json 
+    #- name: Test global install
+    #  run: |
+    #    npm install -g
+    #    sitespeed.io --plugins.add sitespeed.io-plugin-lighthouse --plugins.remove browsertime https://www.sitespeed.io/
