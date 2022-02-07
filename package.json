@@ -1,6 +1,6 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
-  "version": "1.2.0",
+  "version": "9.3.2",
   "bin": {
     "sitespeed.io-plugin-lighthouse": "./index.js"
   },
