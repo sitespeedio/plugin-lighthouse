@@ -61,7 +61,11 @@ module.exports = {
       this.lighthouseFlags = {};
     }
 
-    this.chromeFlags = ['--headless'];
+    this.chromeFlags = [
+      '--headless',
+      '--no-sandbox',
+      '--ignore-certificate-errors'
+    ];
 
     this.usingBrowsertime = false;
     this.summaries = 0;
