@@ -1,5 +1,9 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## 9.5.0 - 2022-03-31
+### Added
+* Updated to Lighthouse 9.5.0.
+
 ## 9.4.0 - 2022-03-05
 ### Added
 * Updated to Lighthouse 9.4.0 and chrome-launcher 0.15.0.
