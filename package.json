@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "chrome-launcher": "0.15.0",
-    "lighthouse": "9.4.0"
+    "lighthouse": "9.5.0"
   },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",
