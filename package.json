@@ -1,9 +1,7 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
   "version": "9.5.0",
-  "bin": {
-    "sitespeed.io-plugin-lighthouse": "./index.js"
-  },
+  "type": "module",
   "publishConfig": {
     "access": "public"
   },
@@ -27,6 +25,9 @@
       "pre-commit": "lint-staged"
     }
   },
+  "engines": {
+    "node": ">=14.19.1"
+  },
   "lint-staged": {
     "*.js": [
       "npm run lint:fix",
@@ -35,9 +36,10 @@
     ]
   },
   "devDependencies": {
-    "eslint": "6.2.2",
+    "eslint": "8.35.0",
     "eslint-config-prettier": "6.1.0",
     "eslint-plugin-prettier": "3.1.0",
+    "eslint-plugin-unicorn": "45.0.2",
     "husky": "3.0.4",
     "lint-staged": "9.2.4",
     "prettier": "1.18.2",
@@ -45,7 +47,8 @@
   },
   "dependencies": {
     "chrome-launcher": "0.15.1",
-    "lighthouse": "9.6.4"
+    "lighthouse": "10.0.2",
+    "@sitespeed.io/plugin": "0.0.6"
   },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",

@@ -13,10 +13,16 @@ If you have checked out as the same level as sitespeed.io you run it like this (
 git clone https://github.com/sitespeedio/sitespeed.io.git
 cd sitespeed.io
 npm install
-bin/sitespeed.js --plugins.add ../plugin-lighthouse/ https://www.sitespeed.io/ -n 1
+bin/sitespeed.js --plugins.add ../plugin-lighthouse/index.js https://www.sitespeed.io/ -n 1
 ```
 ## Run in production
 If you want to run Lighthouse with your other sitespeed.io test, follow the instructions in the [add a plugin docs](https://www.sitespeed.io/documentation/sitespeed.io/plugins/#add-a-plugin) or use the sitespeed.io +1 container. Read the [documentation](https://www.sitespeed.io/documentation/sitespeed.io/lighthouse/).
+
+If you use NodeJs the simplest way is to install the plugin globally:
+```npm install @sitespeed.io/plugin-lighthouse -g```
+
+And then run sitespeed.io adding the pluging using the package name:
+```sitespeed.io --plugins.add @sitespeed.io/plugin-lighthouse https://www.sitespeed.io```
 
 The Lighthouse tests will run after Browsertime finished and run Chrome headless.
 
@@ -29,14 +35,14 @@ The plugin will automatically send the performance, pwa, best practice, accessib
 If you want to sent other Lighthouse metrics you should start by reading the [documentation about collecting metrics](https://www.sitespeed.io/documentation/sitespeed.io/metrics/).
 
 ## Configuration
-By default the plugin run the tests with desktop settings (*lighthouse/lighthouse-core/config/lr-desktop-config*). If you run sitespeed.io with `--mobile`, `--android` or `--ios` the plugin will run the tests with mobile settings (*lighthouse/lighthouse-core/config/lr-mobile-config*).
+By default the plugin run the tests with desktop settings (*lighthouse/core/config/lr-desktop-config*). If you run sitespeed.io with `--mobile`, `--android` or `--ios` the plugin will run the tests with mobile settings (*lighthouse/core/config/lr-mobile-config*).
 
 If you want you can run the tests with your own configuration. You will do that by adding your own JavaScript configuration file ```--lighthouse.config config.js```.
 
 And a configuration file like this:
 
 ```JavaScript
-module.exports = {
+export default config = {
   extends: 'lighthouse:default',
   settings: {
     onlyAudits: ['first-meaningful-paint', 'speed-index', 'interactive']

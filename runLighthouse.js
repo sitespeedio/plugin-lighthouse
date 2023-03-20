@@ -1,39 +1,37 @@
-const lighthouse = require('lighthouse');
-const chromeLauncher = require('chrome-launcher');
+import lighthouse from 'lighthouse';
+import chromeLauncher from 'chrome-launcher';
 
-async function runLighthouse(url, flags, config, chromeFlags, log) {
+export async function runLighthouse(url, flags, config, chromeFlags, log) {
   let chrome;
   try {
     chrome = await chromeLauncher.launch({ chromeFlags });
     flags.port = chrome.port;
     flags.output = 'html';
-  } catch (e) {
+  } catch (error) {
     log.error(
       'Could not start Chrome with flags: %:2j and error %s',
       chromeFlags,
-      e
+      error
     );
-    throw e;
+    throw error;
   }
 
   let result = {};
   try {
     result = await lighthouse(url, flags, config);
-  } catch (e) {
+  } catch (error) {
     log.error(
       'Lighthouse could not test %s please create an upstream issue: https://github.com/GoogleChrome/lighthouse/issues/new?assignees=&labels=bug&template=bug-report.yml',
       url,
-      e
+      error
     );
-    throw e;
+    throw error;
   }
   try {
     await chrome.kill();
-  } catch (e) {
-    log.error('Could not kill chrome: %s', e);
+  } catch (error) {
+    log.error('Could not kill chrome: %s', error);
   }
 
   return result;
 }
-
-module.exports = runLighthouse;
