@@ -1,10 +1,15 @@
-'use strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const fs = require('fs');
-const path = require('path');
-const runLighthouse = require('./runLighthouse');
-const desktopConfiguration = require('lighthouse/lighthouse-core/config/lr-desktop-config');
-const mobileConfiguration = require('lighthouse/lighthouse-core/config/lr-mobile-config');
+import { SitespeedioPlugin } from '@sitespeed.io/plugin';
+
+import desktopConfiguration from 'lighthouse/core/config/lr-desktop-config.js';
+import mobileConfiguration from 'lighthouse/core/config/lr-mobile-config.js';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+import { runLighthouse } from './runLighthouse.js';
 
 // Metrics that will be passed on to Graphite/Influx DB
 const DEFAULT_SUMMARY_METRICS = [
@@ -19,48 +24,53 @@ const DEFAULT_SUMMARY_METRICS = [
   'audits.cumulative-layout-shift.numericValue'
 ];
 
-module.exports = {
-  concurrency: 1,
-  name() {
-    return 'lighthouse';
-  },
-  open(context, options) {
-    this.make = context.messageMaker('lighthouse').make;
-    this.log = context.intel.getLogger('sitespeedio.plugin.lighthouse');
-    this.pug = fs.readFileSync(
-      path.resolve(__dirname, 'lighthouse.pug'),
-      'utf8'
-    );
-    this.statsHelpers = context.statsHelpers;
+export default class LighthousePlugin extends SitespeedioPlugin {
+  constructor(options, context, queue) {
+    super({ name: 'lighthouse', options, context, queue });
+  }
+  // We only want to run one Lighthouse test at a time to make sure they
+  // do not interfer with each other
+  concurrency = 1;
 
+  async open(context, options) {
+    // The pug is the template that is used for creating the HTML result page
+    this.pug = readFileSync(resolve(__dirname, 'lighthouse.pug'), 'utf8');
+
+    // It can be complicated what configuration that is used,
+    // so always log that for clarity
     if (options.lighthouse && options.lighthouse.config) {
-      this.log.info(
+      super.log(
         'Will use Lighthouse configuration file: %s',
-        path.resolve(options.lighthouse.config)
+        'info',
+        resolve(options.lighthouse.config)
       );
-      this.lightHouseConfig = require(path.resolve(options.lighthouse.config));
+      this.lightHouseConfig = await import(resolve(options.lighthouse.config));
+      this.lightHouseConfig = this.lightHouseConfig.default;
     } else {
       if (options.mobile || options.android || options.ios) {
         this.lightHouseConfig = mobileConfiguration;
-        this.log.info('Using default Lighthouse configuration for mobile');
+        super.log('Using default Lighthouse configuration for mobile');
       } else {
-        this.log.info('Using default Lighthouse configuration for desktop');
+        super.log('Using default Lighthouse configuration for desktop');
         this.lightHouseConfig = desktopConfiguration;
       }
     }
 
     if (options.lighthouse && options.lighthouse.flags) {
-      this.log.info(
+      super.log(
         'Will use Lighthouse flags file: %s',
-        path.resolve(options.lighthouse.flags)
+        'info',
+        resolve(options.lighthouse.flags)
       );
       this.lighthouseFlags = JSON.parse(
-        fs.readFileSync(path.resolve(options.lighthouse.flags), 'utf8')
+        readFileSync(resolve(options.lighthouse.flags), 'utf8')
       );
     } else {
       this.lighthouseFlags = {};
     }
 
+    // Flags needed to run Lighthouse, lets switch
+    // to the new headless soon
     this.chromeFlags = [
       '--headless',
       '--no-sandbox',
@@ -72,78 +82,89 @@ module.exports = {
     this.urls = [];
     this.alias = {};
 
-    this.storageManager = context.storageManager;
-    this.filterRegistry = context.filterRegistry;
-    context.filterRegistry.registerFilterForType(
+    this.storageManager = super.getStorageManager();
+
+    // register which metric of all of those we want to
+    // collect and send to time series storage
+    // https://www.sitespeed.io/documentation/sitespeed.io/configure-metrics/
+    const filterRegistry = super.getFilterRegistry();
+    filterRegistry.registerFilterForType(
       DEFAULT_SUMMARY_METRICS,
       'lighthouse.pageSummary'
     );
-  },
-  async processMessage(message, queue) {
-    const make = this.make;
-    const log = this.log;
-
+  }
+  async processMessage(message) {
     switch (message.type) {
       case 'browsertime.setup': {
         // We know we will use Browsertime so we wanna keep track of Browseertime summaries
         this.usingBrowsertime = true;
-        log.info('Will run Lighthouse tests after Browsertime has finished');
+        super.log('Will run Lighthouse tests after Browsertime has finished');
         break;
       }
+
+      // If we have an alias for an URL we browsertime will tell
+      // us and we can use that alias for the URL
       case 'browsertime.alias': {
         this.alias[message.url] = message.data;
         break;
       }
 
       case 'browsertime.pageSummary': {
+        // If all URLs been tested in Browsertime we can
+        // move on with Lighthouse tests. Lighthouse uses
+        // its own Chrome version so we do not want to run that at the
+        // same time as we Browsertime since it will affeect our metrics
         if (this.usingBrowsertime) {
           this.summaries++;
-          if (this.summaries === this.urls.length) {
+          if (this.summaries === this.urls.length)
             for (let urlAndGroup of this.urls) {
-              queue.postMessage(make('lighthouse.audit', urlAndGroup));
+              super.sendMessage('lighthouse.audit', urlAndGroup);
             }
-          }
         }
         break;
       }
 
+      // sitespeed.io is in the setup phase
       case 'sitespeedio.setup': {
-        queue.postMessage(
-          make('html.pug', {
-            id: 'lighthouse',
-            name: 'Lighthouse',
-            pug: this.pug,
-            type: 'pageSummary'
-          })
-        );
+        // Let the HTML plugin know that we want to generate a
+        // Lighthouse result page using our pug file
+        super.sendMessage('html.pug', {
+          id: 'lighthouse',
+          name: 'Lighthouse',
+          pug: this.pug,
+          type: 'pageSummary'
+        });
 
-        queue.postMessage(
-          make('budget.addMessageType', {
-            type: 'lighthouse.pageSummary'
-          })
-        );
+        // If you want to use Lighthouse inn your budget
+        // we need to tell our budget plugin what kind of
+        // summary messages it will use.
+        super.sendMessage('budget.addMessageType', {
+          type: 'lighthouse.pageSummary'
+        });
         break;
       }
 
+      // Sorry we cannot run Lighthouse when we do Browsertime scripting
+      // since Lighthouse using its own Chrome version
       case 'browsertime.navigationScripts': {
-        log.info(
+        super.log(
           'Lighthouse can only be used on URLs and not with scripting/multiple pages at the moment'
         );
         break;
       }
 
       case 'url': {
+        // If we run Browsertime, we used store the URLs we want to test
+        // and run the tests when Browsertime is finisshed.
         if (this.usingBrowsertime) {
           this.urls.push({ url: message.url, group: message.group });
         } else {
           const url = message.url;
           const group = message.group;
-          queue.postMessage(
-            make('lighthouse.audit', {
-              url,
-              group
-            })
-          );
+          super.sendMessage('lighthouse.audit', {
+            url,
+            group
+          });
         }
         break;
       }
@@ -151,9 +172,10 @@ module.exports = {
       case 'lighthouse.audit': {
         const { url, group } = message.data;
         let result;
-        log.info('Start collecting Lighthouse result for %s', url);
-        log.debug(
+        super.log('Start collecting Lighthouse result for %s', 'info', url);
+        super.log(
           'Lighthouse flags %:2j , config %:2j , Chrome flags %:2j',
+          'debug',
           this.lighthouseFlags,
           this.lightHouseConfig,
           this.chromeFlags
@@ -164,10 +186,10 @@ module.exports = {
             this.lighthouseFlags,
             this.lightHouseConfig,
             this.chromeFlags,
-            log
+            super.getLog()
           );
-          log.verbose('Result from Lighthouse:%:2j', result.lhr);
-          log.verbose('Report from Lighthouse:%:2j', result.report);
+          super.log('Result from Lighthouse:%:2j', 'verbose', result.lhr);
+          super.log('Report from Lighthouse:%:2j', 'verbose', result.report);
           await this.storageManager.writeDataForUrl(
             result.report,
             'lighthouse.html',
@@ -175,31 +197,26 @@ module.exports = {
             undefined,
             this.alias[url]
           );
-          queue.postMessage(
-            make('lighthouse.report', result.report, {
-              url,
-              group
-            })
-          );
-          queue.postMessage(
-            make('lighthouse.pageSummary', result.lhr, {
-              url,
-              group
-            })
-          );
-        } catch (e) {
-          queue.postMessage(
-            make(
-              'error',
-              'Lighthouse got the following errors: ' + JSON.stringify(e),
-              {
-                url
-              }
-            )
+          super.sendMessage('lighthouse.report', result.report, {
+            url,
+            group
+          });
+          super.sendMessage('lighthouse.pageSummary', result.lhr, {
+            url,
+            group
+          });
+        } catch (error) {
+          super.log(error, 'error');
+          super.sendMessage(
+            'error',
+            'Lighthouse got the following errors: ' + JSON.stringify(error),
+            {
+              url
+            }
           );
         }
         break;
       }
     }
   }
-};
+}
