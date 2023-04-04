@@ -1,5 +1,11 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## 10.0.2 - 2023-04-04
+### Added
+* Updated to Lighthouse 10.0.2
+
+### Changed 
+* The plughin work with sitespeed.io version > 27
 ## 9.5.0 - 2022-03-31
 ### Added
 * Updated to Lighthouse 9.5.0.
