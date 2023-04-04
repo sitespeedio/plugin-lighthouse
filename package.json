@@ -1,6 +1,6 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
-  "version": "9.5.0",
+  "version": "10.0.2",
   "type": "module",
   "publishConfig": {
     "access": "public"
