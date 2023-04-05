@@ -1,5 +1,9 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## 10.1.0 - 2023-04-05
+### Added 
+* Updated to Lighthouse 10.1.0
+* Use the new Chrome headless flag when running Lighthouse.
 ## 10.0.2 - 2023-04-04
 ### Added
 * Updated to Lighthouse 10.0.2
