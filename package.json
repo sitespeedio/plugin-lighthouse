@@ -1,6 +1,6 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
-  "version": "10.1.0",
+  "version": "10.0.2",
   "type": "module",
   "exports": "./index.js",
   "publishConfig": {
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "chrome-launcher": "0.15.1",
-    "lighthouse": "10.0.2",
+    "lighthouse": "10.1.0",
     "@sitespeed.io/plugin": "0.0.6"
   },
   "scripts": {
