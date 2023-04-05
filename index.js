@@ -72,7 +72,7 @@ export default class LighthousePlugin extends SitespeedioPlugin {
     // Flags needed to run Lighthouse, lets switch
     // to the new headless soon
     this.chromeFlags = [
-      '--headless',
+      '--headless=new',
       '--no-sandbox',
       '--ignore-certificate-errors'
     ];
