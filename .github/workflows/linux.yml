@@ -25,7 +25,7 @@ jobs:
     - name: Show sitespeed.io version
       run: sitespeed.io --version
     - name: Run tests using Lighthouse plugin
-      run: sitespeed.io --plugins.add . --plugins.remove browsertime https://www.sitespeed.io/
+      run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/
     - name: Run tests using Lighthouse plugin as mobile
       run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/ --mobile
     - name: Run tests with configuration file
