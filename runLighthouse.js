@@ -1,5 +1,5 @@
 import lighthouse from 'lighthouse';
-import chromeLauncher from 'chrome-launcher';
+import * as chromeLauncher from 'chrome-launcher';
 
 export async function runLighthouse(url, flags, config, chromeFlags, log) {
   let chrome;
