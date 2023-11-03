@@ -74,7 +74,8 @@ export default class LighthousePlugin extends SitespeedioPlugin {
     this.chromeFlags = [
       '--headless=new',
       '--no-sandbox',
-      '--ignore-certificate-errors'
+      '--ignore-certificate-errors',
+      '--disable-dev-shm-usage'
     ];
 
     this.usingBrowsertime = false;
