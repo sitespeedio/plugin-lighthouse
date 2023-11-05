@@ -1,7 +1,12 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+
+## 11.3.2 - 2023-11-05
+### Fixed
+* Downgrade puppeteer, thank you [bairov pavel](https://github.com/Amerousful) for PR [#123](https://github.com/sitespeedio/plugin-lighthouse/pull/123)
+
 ## 11.3.1 - 2023-11-03
-### Added
+### Fixed
 * Added dev-shim fix.
 
 ## 11.3.0 - 2023-11-03
