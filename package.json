@@ -51,6 +51,10 @@
     "lighthouse": "11.3.0",
     "@sitespeed.io/plugin": "0.0.6"
   },
+  "overrides": {
+    "puppeteer-core": "20.8.0",
+    "puppeteer": "20.8.0"
+  },
   "scripts": {
     "lint": "eslint . && npm run pug-lint",
     "lint:fix": "eslint . --fix",
