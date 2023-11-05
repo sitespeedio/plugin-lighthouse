@@ -1,5 +1,5 @@
 # sitespeed.io plugin for Lighthouse
-[![Build Status](https://travis-ci.org/sitespeedio/plugin-lighthouse.svg?branch=master)](https://travis-ci.org/sitespeedio/plugin-lighthouse)
+[![Run Lighthouse plugin on Linux](https://github.com/sitespeedio/plugin-lighthouse/actions/workflows/linux.yml/badge.svg)](https://github.com/sitespeedio/plugin-lighthouse/actions/workflows/linux.yml)
 
 Run Lighthouse as a plugin for sitespeed.io (inspired by [siteriaitaliana](https://github.com/siteriaitaliana/plugin-lighthouse)).
 
