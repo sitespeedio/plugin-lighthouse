@@ -33,4 +33,4 @@ jobs:
     - name: Test global install
       run: |
         npm install -g
-        sitespeed.io --plugins.add @sitespeed.io/plugin-lighthouse --plugins.remove browsertime https://www.sitespeed.io/
+        sitespeed.io --plugins.add "@sitespeed.io/plugin-lighthouse" --plugins.remove browsertime https://www.sitespeed.io/
