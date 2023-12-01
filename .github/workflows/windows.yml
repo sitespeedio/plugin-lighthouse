@@ -24,7 +24,7 @@ jobs:
       run: sitespeed.io --version
       shell: bash
     - name: Run tests using Lighthouse plugin
-      run: sitespeed.io --plugins.add ${{ github.workspace }}/index.js --plugins.remove browsertime https://www.sitespeed.io/
+      run: sitespeed.io --plugins.add file:///${{ github.workspace }}/index.js --plugins.remove browsertime https://www.sitespeed.io/
       shell: bash
     - name: Run tests using Lighthouse plugin as mobile
       run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/ --mobile
