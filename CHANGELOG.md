@@ -1,5 +1,12 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## 12.1.0 - 2024-07-06
+### Added
+* Upgraded to Lighthouse 12.1.0
+
+## 12.0.0 - 2024-04-23
+### Added
+* Upgraded to Lighthouse 12.0.0
 
 ## 11.3.2 - 2023-11-05
 ### Fixed
