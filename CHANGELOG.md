@@ -1,5 +1,10 @@
 # CHANGELOG - sitespeed.io Lighthouse plugin 
 
+## 12.3.0 - 2025-01-21
+### Added
+* Upgraded to Lighthouse 12.3.0
+* Upgraded to use sitespeedio@plgin 1.0.0. That means you need sitespeed.io 36 to be able to use this version of the plugin.
+
 ## 12.1.0 - 2024-07-06
 ### Added
 * Upgraded to Lighthouse 12.1.0
