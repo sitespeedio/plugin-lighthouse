@@ -1,6 +1,6 @@
 {
   "name": "@sitespeed.io/plugin-lighthouse",
-  "version": "12.1.0",
+  "version": "12.3.0",
   "type": "module",
   "exports": "./index.js",
   "publishConfig": {
