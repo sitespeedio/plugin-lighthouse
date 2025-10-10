@@ -47,8 +47,8 @@
     "pug-lint": "2.6.0"
   },
   "dependencies": {
-    "chrome-launcher": "1.1.2",
-    "lighthouse": "12.3.0",
+    "chrome-launcher": "1.2.1",
+    "lighthouse": "13.0.0",
     "@sitespeed.io/plugin": "1.0.0"
   },
   "overrides": {
