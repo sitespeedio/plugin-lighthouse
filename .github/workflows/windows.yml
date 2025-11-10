@@ -1,0 +1,42 @@
+name: Run Lighthouse plugin on Windows
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '20.x'
+    - name: Install sitespeed.io
+      run: |
+        npm install sitespeed.io -g
+        cd ../plugin-lighthouse
+        npm install
+    - name: Show sitespeed.io version
+      run: sitespeed.io --version
+      shell: bash
+    - name: Test global install
+      run: |
+        npm install -g
+        sitespeed.io --plugins.add "@sitespeed.io/plugin-lighthouse" --plugins.remove browsertime https://www.sitespeed.io/
+      shell: bash  
+    - name: Run tests using Lighthouse plugin
+      run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/
+      shell: bash
+    - name: Run tests using Lighthouse plugin as mobile
+      run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/ --mobile
+      shell: bash
+    - name: Run tests with configuration file
+      run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/ --lighthouse.config ./test/config.js
+      shell: bash
+    - name: Run tests with flag file
+      run: sitespeed.io --plugins.add ./index.js --plugins.remove browsertime https://www.sitespeed.io/ --lighthouse.flags ./test/flags.json 
+      shell: bash
