@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "chrome-launcher": "1.2.1",
-    "lighthouse": "13.0.0",
+    "lighthouse": "13.0.1",
     "@sitespeed.io/plugin": "1.0.0"
   },
   "overrides": {
