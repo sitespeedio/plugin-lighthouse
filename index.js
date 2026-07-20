@@ -24,6 +24,8 @@ const DEFAULT_SUMMARY_METRICS = [
   'audits.cumulative-layout-shift.numericValue'
 ];
 
+const isEnabled = (option) => option === true || option?.enabled === true;
+
 export default class LighthousePlugin extends SitespeedioPlugin {
   constructor(options, context, queue) {
     super({ name: 'lighthouse', options, context, queue });
@@ -47,7 +49,7 @@ export default class LighthousePlugin extends SitespeedioPlugin {
       this.lightHouseConfig = await import(resolve(options.lighthouse.config));
       this.lightHouseConfig = this.lightHouseConfig.default;
     } else {
-      if (options.mobile || options.android || options.ios) {
+      if (isEnabled(options.mobile) || isEnabled(options.android) || isEnabled(options.ios)) {
         this.lightHouseConfig = mobileConfiguration;
         super.log('Using default Lighthouse configuration for mobile');
       } else {
