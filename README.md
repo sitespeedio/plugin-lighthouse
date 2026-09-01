@@ -61,3 +61,39 @@ You can also add Lighthouse flags by a JSON file ```--lighthouse.flags flag.json
 
 Read all about configuring Lighthouse at [https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md](https://github.com/GoogleChrome/lighthouse/blob/master/docs/configuration.md).
 
+### Authenticated pages
+
+The plugin installs a `Cookie` value from `extraHeaders` into Lighthouse
+Chrome's cookie jar before the audit. The header is removed from
+`extraHeaders` after conversion so Chrome can generate the request cookie
+header using its normal domain and path rules:
+
+```JSON
+{
+  "extraHeaders": {
+    "Cookie": "session=abc; csrf=token"
+  }
+}
+```
+
+For full control over cookie scope and security attributes, use structured
+cookies in the same Lighthouse flags file:
+
+```JSON
+{
+  "cookies": [
+    {
+      "name": "session",
+      "value": "abc",
+      "domain": ".example.com",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax"
+    }
+  ]
+}
+```
+
+When cookies are configured, the plugin enables Lighthouse's
+`disableStorageReset` flag so the installed cookies survive until navigation.

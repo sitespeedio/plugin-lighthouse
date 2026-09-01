@@ -47,15 +47,17 @@
     "pug-lint": "2.6.0"
   },
   "dependencies": {
+    "@sitespeed.io/plugin": "1.0.0",
     "chrome-launcher": "1.2.1",
-    "lighthouse": "13.0.1",
-    "@sitespeed.io/plugin": "1.0.0"
+    "chrome-remote-interface": "0.34.0",
+    "lighthouse": "13.0.1"
   },
   "overrides": {
     "puppeteer-core": "20.8.0",
     "puppeteer": "20.8.0"
   },
   "scripts": {
+    "test": "node --test test/*.test.js",
     "lint": "eslint . && npm run pug-lint",
     "lint:fix": "eslint . --fix",
     "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check",
